@@ -1,374 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CodeVerter - Programming Language Converter</title>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { margin: 0; background: #111827; }
-    textarea { font-family: 'Courier New', monospace; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #1f2937; }
-    ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codeverter</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="root"></div>
+    <header>
+        <h1>Codeverter</h1>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
 
-  <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
+    <main>
+        <section id="languages">
+            <h2>Select Language</h2>
+            <select id="language-select">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+            </select>
+        </section>
 
-    const languages = [
-      "05AB1E","0815","A-0 System","A.NET (A#)","A+ (A plus)","ABAP","ABC","ACC",
-      "Action!","ActionScript","Actor","Ada","Adenine","AdvPL","Agda","Agilent VEE",
-      "Agora","AIMMS","Aldor","Alef","ALF","ALGOL","ALGOL 58","ALGOL 60","ALGOL 68",
-      "ALGOL W","Alice ML","Alma-0","AmbientTalk","Amiga E","AMOS","AMPL","AngelScript",
-      "Apache Pig Latin","Apex (Salesforce)","APL","APL2","AppleScript","APT","Arc",
-      "ARexx","Argus","ArkTS","ARM Assembly","ArnoldC","Assembly","AssemblyScript",
-      "ATS","AutoHotkey","AutoIt","AutoLISP","Averest","AWK","Axum",
-      "B","Babashka","Ballerina","BANANA","Bash","BASIC","Batch","BeanShell","Beatnik",
-      "Befunge","Befunge-93","Befunge-98","Benedictum","BETA","BitC","BLISS","Blockly",
-      "Boolfuck","Boomerang","Bosque","Bourne Shell","BQN","Brainfuck","Brython","BUGS",
-      "C","C Shell","C#","C++","C++/CLI","C++/CX","C-- (C minus minus)","C/AL",
-      "Cache ObjectScript","Caml","Carbon","Cat","Catrobat","Cayenne","Cecil","CESIL",
-      "Ceylon","CFEngine","Ch","Chapel","Charm","Charcoal","Chef","Cheese","CHILL",
-      "CHIP-8","Chibi-Scheme","ChucK","CJam","Claire","Clarion","Clean","Clipper",
-      "CLIPS","CLIST","CLU","Clojure","ClojureScript","CMS-2","COBOL","Cobra","Codon",
-      "CoffeeScript","ColdFusion","COMAL","COMIT","Common Lisp","Component Pascal",
-      "COMPASS","COMTRAN","Concat","Concatenative","Concurnas","Concurrent Pascal",
-      "Constraint Handling Rules","Control Language","CORAL","CorVision","Coq (Rocq)",
-      "COWSEL","CPL","Crystal","Cryptol","Csound","CUDA","Cubix","Cuneiform","Curl",
-      "Curry","Cybil","Cyclone","Cypher Query Language","Cython",
-      "D","Dao","Dart","Deadfish","Dhall","Dis","DIBOL","Dockerfile","DogeLang","Dylan",
-      "E","E++","Eff","Eiffel","Elixir","Elm","Emacs Lisp","Embedded C","Emmental",
-      "EmojiCode","Emoticon","Entropy","Erlang","Eta",
-      "F","F#","F*","Factor","Fantom","FAUST","Felix","Fennel","Fetlang","Fish",
-      "Fission","Fjolnir","Flamingo","Flavors","Flex","Flix","FlooP","Flow",
-      "FLOW-MATIC","FOCAL","FOCUS","FOIL","Folders","FORMAC","Forth","Fortran",
-      "Fortress","FoxPro","FP","FRACTRAN","Frank","Franz Lisp","Frege","Funge-98","Futhark",
-      "G (LabVIEW)","GAMS","GAP","Game Maker Language","GameMonkey Script","GDScript",
-      "GDL","GEORGE","Gherkin","Gleam","Glass","GLSL","GML","GNU E","GNU Guile",
-      "Go","Go!","GOAL","Godel","GolfScript","Golo","Google Apps Script","Gosu",
-      "GOTRAN","GPSS","Gradle","Grain","Granule","Grasshopper","Gravity","Greenfoot",
-      "Groot","Groovy",
-      "Hack","HAML","Handlebars","Hare","Haskell","Hazel","HCL","Hexagony","HLSL",
-      "Hodor","HolyC","Homespring","Hope","HQ9+","HQ9++","HTML","Huff","Hy",
-      "Icon","Idris","Imba","Incident","INTERCAL","Io","Ioke","Iota","IPL","Isabelle",
-      "J","Jai","Janet","Japt","Java","JavaFX Script","Jelly","JellyScript","Jinja2",
-      "JOSS","JOVIAL","JRuby","JSFuck","JSX","Julia","Jule","Jython",
-      "JavaScript","JavaScript (Bun)","JavaScript (Deno)","JavaScript (Node.js)",
-      "Angular Template","LiveScript","Marko","Mithril","Riot.js","Roy","Svelte","Vue Template",
-      "K","Kitten","Kipple","Koka","Kotlin","KornShell",
-      "LabVIEW","Ladder","Lazy K","Lean","Legit","Less","LFE","LilyPond","Links",
-      "Lisp","LiveCode","Lobster","Logo","LOLCODE","Lua","Lucid","LYaPAS",
-      "M4","MAD","Magik","Magma","Makefile","Malbolge","Maple","MATL","MATLAB",
-      "MATH-MATIC","Maude","Max (MSP)","Maxima","MaxScript","Maya MEL","Maven POM",
-      "Mesa","Mercury","MetaPost","Microcode","Microsoft Power Fx","Mindfck",
-      "MIPS Assembly","Miranda","MISRA C","ML","Modelica","Modula-2","Modula-3",
-      "Mojo","Monicelli","MoonScript","mruby","MSL","MUMPS","Muriel","MySQL",
-      "Nemerle","Neko","NetLogo","Newlisp","NewtonScript","Newspeak","Nickle",
-      "Ni","Nim","Nit","Nix","Nu","Nushell",
-      "Oberon","Oberon-2","OCaml","Octave","Odin","Omgrofl","Ook!","OpenCL",
-      "OpenSCAD","Opal","Orca","Oz",
-      "p5.js","PACT I","Paintfuck","Parasail","Pascal","Path","PAWN","Perl",
-      "PGF/TikZ","PHP","PHP 7","PHP 8","Picolisp","Piet","Piglatin","Pike",
-      "PILOT","Pixie","PL/I","PL/M","PL/SQL","Plankalkul","Pony","POP-2","Potion",
-      "PostgreSQL","PostScript","POV-Ray","PowerShell","Processing","Prolog",
-      "Prograph","Pug","PureScript","PyPy","Python","Pyth",
-      "Q","Q#",
-      "R","Racket","Rail","Raku","Red","Rebol","ReasonML","Retina","reMorse",
-      "ReScript","RISC-V Assembly","Roc","Rockstar","Roy","RPG","RPGLE","Ruby",
-      "Rust","RustPython",
-      "SAS","Sass","Scala","Schoenberg","SCSS","Scheme","Sed","Seed7","Self",
-      "Shakespeare","SIMSCRIPT","Simula","Simulink","SKI Combinator","Skulpt",
-      "Slang","SLIP","Smalltalk","SNOBOL","SNOBOL4","Snowflake","Solidity",
-      "Spoon","Spooky","SQL","Squirrel","Standard ML","Stan","StarLogo","Stax",
-      "Steak","Subleq","SuperCollider","Suzy","Swift",
-      "Tamerlane","Taxi","Tcl","Tcl/Tk","Technologic","TempleOS","Thue","TOML",
-      "TorqueScript","TRAC","TreeHugger","Trinity","Trollscript","TSX","T-SQL",
-      "Twig","Twelf","TypeScript",
-      "Uiua","Unary","Unlambda","UnrealScript","Ur",
-      "Vala","Vale","VB.NET","Velato","Velociraptor","Verilog","VHDL","Visual Basic","Vyxal",
-      "Waduzitdo","Wax","WebAssembly","Wgsl","Whiley","Whitespace","Wierd","Wolfram","Wren",
-      "x86 Assembly","X10","XL","XPath","XQuery","XSLT",
-      "YAML","Yorick","YOLO",
-      "Zig","Zephir","ZOMBIE","Zsh",
-      "AsciiDots","Argh!","BIT","Boobeans","Brainfork","CellTail","C Flat",
-      "Chicken","l33t (leet)","Tru","TURKEY BOMB","TriINTERCAL","Wumpus","Zipcode"
-    ].sort();
+        <section id="code-panel">
+            <h2>Code Panel</h2>
+            <textarea id="code-input" placeholder="Write your code here..."></textarea>
+            <textarea id="code-output" placeholder="Output will appear here..." readonly></textarea>
+        </section>
+    </main>
 
-    const LanguageDropdown = ({ value, onChange }) => {
-      const [isOpen, setIsOpen] = useState(false);
-      const [searchTerm, setSearchTerm] = useState('');
-      const [isCustom, setIsCustom] = useState(false);
-      const [customValue, setCustomValue] = useState('');
-      const ref = useRef(null);
-      const filtered = languages.filter(l => l.toLowerCase().includes(searchTerm.toLowerCase()));
+    <footer>
+        <p>&copy; 2026 DeleyeVR. All rights reserved.</p>
+    </footer>
 
-      useEffect(() => {
-        const handler = e => {
-          if (ref.current && !ref.current.contains(e.target)) {
-            setIsOpen(false);
-            setSearchTerm('');
-          }
-        };
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-      }, []);
-
-      const applyCustom = () => {
-        if (customValue.trim()) {
-          onChange(customValue.trim());
-          setIsCustom(false);
-          setIsOpen(false);
-        }
-      };
-
-      if (isCustom) {
-        return (
-          <div className="flex items-center gap-2 w-52">
-            <input
-              type="text"
-              value={customValue}
-              onChange={e => setCustomValue(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') applyCustom(); if (e.key === 'Escape') setIsCustom(false); }}
-              placeholder="Type language..."
-              className="flex-1 px-3 py-3 bg-gray-700 text-gray-200 rounded-lg border border-blue-500 text-sm outline-none w-full"
-              autoFocus
-            />
-            <button onClick={applyCustom} className="px-2 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm transition-colors" title="Apply">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/></svg>
-            </button>
-            <button onClick={() => setIsCustom(false)} className="px-2 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition-colors" title="Cancel">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-        );
-      }
-
-      return (
-        <div className="relative" ref={ref}>
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center justify-between gap-2 bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded-lg w-52 text-left border border-gray-600"
-          >
-            <span className="text-gray-200 truncate">{value}</span>
-            <svg className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {isOpen && (
-            <div className="absolute top-full left-0 mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-xl z-50 w-64 max-h-72 overflow-hidden">
-              <div className="p-2 border-b border-gray-600">
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  placeholder={`Search ${languages.length} languages...`}
-                  className="w-full px-3 py-2 bg-gray-800 text-gray-200 rounded border border-gray-600 text-sm outline-none focus:border-blue-500"
-                  autoFocus
-                />
-              </div>
-              <div className="overflow-y-auto max-h-44">
-                {filtered.length > 0 ? filtered.map(l => (
-                  <button
-                    key={l}
-                    onClick={() => { onChange(l); setIsOpen(false); setSearchTerm(''); }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-600 transition-colors ${value === l ? 'bg-blue-600 text-white' : 'text-gray-200'}`}
-                  >{l}</button>
-                )) : (
-                  <div className="px-4 py-3 text-gray-400 text-sm text-center">No languages found</div>
-                )}
-              </div>
-              <div className="border-t border-gray-600 p-2">
-                <button
-                  onClick={() => { setIsCustom(true); setIsOpen(false); setCustomValue(''); setSearchTerm(''); }}
-                  className="w-full text-left px-3 py-2 text-sm text-blue-400 hover:bg-gray-600 rounded transition-colors flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
-                  Type custom language...
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    };
-
-    const App = () => {
-      const [apiKey, setApiKey] = useState('');
-      const [apiKeySaved, setApiKeySaved] = useState(false);
-      const [sourceCode, setSourceCode] = useState(
-        "# Example Python code\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(10))"
-      );
-      const [targetCode, setTargetCode] = useState('');
-      const [sourceLanguage, setSourceLanguage] = useState('Python');
-      const [targetLanguage, setTargetLanguage] = useState('JavaScript');
-      const [isConverting, setIsConverting] = useState(false);
-      const [error, setError] = useState('');
-      const [copied, setCopied] = useState(false);
-
-      const saveKey = () => {
-        if (apiKey.trim().startsWith('sk-ant-')) {
-          setApiKeySaved(true);
-          setError('');
-        } else {
-          setError('Invalid API key format. Must start with sk-ant-');
-        }
-      };
-
-      const convertCode = async () => {
-        if (!apiKeySaved) { setError('Please enter your Anthropic API key first.'); return; }
-        if (!sourceCode.trim()) { setError('Please enter some code to convert.'); return; }
-        setIsConverting(true); setError(''); setTargetCode('');
-        try {
-          const res = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': apiKey,
-              'anthropic-version': '2023-06-01',
-              'anthropic-dangerous-direct-browser-access': 'true'
-            },
-            body: JSON.stringify({
-              model: 'claude-sonnet-4-20250514',
-              max_tokens: 4096,
-              messages: [{
-                role: 'user',
-                content: `Convert the following ${sourceLanguage} code to ${targetLanguage}. Return only the converted code with no explanation or markdown formatting:\n\n${sourceCode}`
-              }]
-            })
-          });
-          if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error?.message || `HTTP ${res.status}`);
-          }
-          const data = await res.json();
-          setTargetCode(data.content[0].text);
-        } catch (err) {
-          setError(`Error: ${err.message}`);
-        } finally {
-          setIsConverting(false);
-        }
-      };
-
-      const copyToClipboard = () => {
-        if (!targetCode) return;
-        navigator.clipboard.writeText(targetCode).then(() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        });
-      };
-
-      const swapLanguages = () => {
-        setSourceLanguage(targetLanguage);
-        setTargetLanguage(sourceLanguage);
-        if (targetCode) {
-          setSourceCode(targetCode);
-          setTargetCode('');
-        }
-      };
-
-      return (
-        <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-          {/* Header */}
-          <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                <h1 className="text-2xl font-bold">CodeVerter</h1>
-                <span className="text-gray-400 text-sm hidden sm:inline">· {languages.length} Languages</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 p-4 sm:p-6">
-            <div className="max-w-7xl mx-auto space-y-6">
-
-              {/* API Key Section */}
-              {!apiKeySaved ? (
-                <div className="bg-gray-800 border border-yellow-600 rounded-lg p-4">
-                  <p className="text-yellow-400 text-sm font-semibold mb-2">🔑 Anthropic API Key Required</p>
-                  <p className="text-gray-400 text-xs mb-3">Get yours at <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">console.anthropic.com</a>. Your key is never stored or sent anywhere except directly to Anthropic.</p>
-                  <div className="flex gap-2">
-                    <input
-                      type="password"
-                      value={apiKey}
-                      onChange={e => setApiKey(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && saveKey()}
-                      placeholder="sk-ant-..."
-                      className="flex-1 px-3 py-2 bg-gray-700 text-gray-200 rounded border border-gray-600 text-sm outline-none focus:border-blue-500"
-                    />
-                    <button
-                      onClick={saveKey}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm font-medium transition-colors"
-                    >Save Key</button>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-gray-800 border border-green-700 rounded-lg px-4 py-3 flex items-center justify-between">
-                  <span className="text-green-400 text-sm">✓ API key saved for this session</span>
-                  <button onClick={() => { setApiKeySaved(false); setApiKey(''); }} className="text-gray-500 hover:text-gray-300 text-xs underline">Change</button>
-                </div>
-              )}
-
-              {/* Language Selector */}
-              <div className="flex items-center justify-center gap-3 flex-wrap">
-                <LanguageDropdown value={sourceLanguage} onChange={setSourceLanguage} />
-                <button
-                  onClick={swapLanguages}
-                  title="Swap languages"
-                  className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg border border-gray-600 transition-colors"
-                >
-                  <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                  </svg>
-                </button>
-                <LanguageDropdown value={targetLanguage} onChange={setTargetLanguage} />
-              </div>
-
-              {/* Convert Button */}
-              <div className="flex justify-center">
-                <button
-                  onClick={convertCode}
-                  disabled={isConverting}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-900 disabled:cursor-not-allowed px-8 py-3 rounded-lg font-medium transition-colors text-base"
-                >
-                  {isConverting ? (
-                    <>
-                      <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                      </svg>
-                      Converting...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                      </svg>
-                      Convert Code
-                    </>
-                  )}
-                </button>
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded-lg text-center text-sm">
-                  {error}
-                </div>
-              )}
-
-              {/* Code Panels */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Source */}
-                <div className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
-                  <div className="bg-gray-750 bg-gray-700 px-4 py-2 border-b border-gray-600 flex items-center justify-between">
-                    <h3 classNam
+    <script src="script.js"></script>
+</body>
+</html>

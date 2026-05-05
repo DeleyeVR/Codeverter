@@ -1,44 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codeverter</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <header>
-        <h1>Codeverter</h1>
-        <nav>
+import React, { useEffect, useState } from 'react';
+
+const Index = () => {
+    const [languages, setLanguages] = useState([]);
+
+    useEffect(() => {
+        fetch('languages.json')
+            .then(response => response.json())
+            .then(data => setLanguages(data))
+            .catch(error => console.error('Error fetching languages:', error));
+    }, []);
+
+    return (
+        <div>
+            <h1>Languages</h1>
             <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                {languages.map((language, index) => (
+                    <li key={index}>{language}</li>
+                ))}
             </ul>
-        </nav>
-    </header>
+        </div>
+    );
+};
 
-    <main>
-        <section id="languages">
-            <h2>Select Language</h2>
-            <select id="language-select">
-                <option value="javascript">JavaScript</option>
-                <option value="python">Python</option>
-                <option value="java">Java</option>
-            </select>
-        </section>
-
-        <section id="code-panel">
-            <h2>Code Panel</h2>
-            <textarea id="code-input" placeholder="Write your code here..."></textarea>
-            <textarea id="code-output" placeholder="Output will appear here..." readonly></textarea>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2026 DeleyeVR. All rights reserved.</p>
-    </footer>
-
-    <script src="script.js"></script>
-</body>
-</html>
+export default Index;
